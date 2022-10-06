@@ -54,7 +54,6 @@ for song in songlist[1:]:
       return headers
   sessions=requests.session()
   sessions.mount('https://www.aathavanitli-gani.com', HTTP20Adapter())
-  #r=sessions.post(url,data=playload,headers=getHeaders())
   r=sessions.post(url,headers=getHeaders())
   print(r)
 
