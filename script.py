@@ -13,9 +13,15 @@ import os
 outdir = "/output/Aathavanitil_Gaani/"
 ######
 
-songlist = []
 list_alpha = []
-list_alpha[:0] = string.ascii_lowercase[:26]
+url2 = "https://www.aathavanitli-gani.com/Anukramanika"
+rqst2 = requests.get(url2)
+for a in rqst2.content.splitlines():
+    if ("Anukramanika/" in str(a)):
+      alpha =  str(a).split("Anukramanika/")[1].split('"')[0]
+      list_alpha.append(alpha)
+      
+songlist = []
 for alpha in list_alpha:
   url1 = f"https://www.aathavanitli-gani.com/Anukramanika/{alpha}"
   rqst1 = requests.get(url1)
@@ -25,9 +31,12 @@ for alpha in list_alpha:
           #print(og_url)
           songlist.append(og_url)
   time.sleep(1)
-  
+      
 files_outdir = os.listdir(outdir)
-for song in songlist[1:]:
+for enum,song in enumerate(songlist):
+  if "," in song:
+    continue
+
   og_url = song
   songname = og_url.split("/")[-1]
 
@@ -35,13 +44,21 @@ for song in songlist[1:]:
     print("song skipped")
     continue
 
-  time.sleep(1)
+  time.sleep(2)
+
   rqst = requests.get(og_url)
+  ss = 0
   for a in rqst.content.splitlines():
       if "getSongStream" in str(a):
           ss = str(a).split("..")[-1].split(">")[0][:-1]
           print(ss)
-  path1  = ss
+
+  if not ss:
+    print("force skip failed to fetch link")
+    continue
+  else:
+    path1  = ss
+
   url = "https://www.aathavanitli-gani.com"+path1
   def getHeaders():
       headers = {
@@ -59,6 +76,7 @@ for song in songlist[1:]:
 
   if str(r) != "<Response [200]>":
     print(og_url)
+    time.sleep(20)
 
   if str(r) == "<Response [200]>":
     with open(outdir+f'{songname}.mp3', 'wb') as f:
